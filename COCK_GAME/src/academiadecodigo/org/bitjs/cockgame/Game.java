@@ -4,20 +4,30 @@ import org.academiadecodigo.bootcamp.Prompt;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 
 public class Game {
 
-        private Scanner in;
         private String[] board;
         private String play;
-        private Prompt prompt;
+        private LinkedList<Dispatcher> playerPool;
 
-        public void init (){
+        public Game(LinkedList<Dispatcher> playerPool){
+            this.playerPool = playerPool;
+        }
+
+    /*    public void start(){
+            checkLogic(0);
+            checkWinner();
+        }*/
+
+        /*public void checkLogic (int player){
+            playerPool.get(1).
             in = new Scanner(System.in);
             board = new String[9];
-            play = "X";
+            String checkPlay = play;
             String winner = null;
             populateEmptyBoard();
 
@@ -26,17 +36,14 @@ public class Game {
             printBoard();
             System.out.print("X's will play first. Enter a slot number to place X in: ");
 
-            while (winner == null) {
                 int numInput;
                 try {
                     numInput = in.nextInt();
                     if (!(numInput > 0 && numInput <= 9)) {
                         System.out.println("Invalid input; re-enter slot number:");
-                        continue;
                     }
                 } catch (InputMismatchException e) {
                     System.out.println("Invalid input; re-enter slot number:");
-                    continue;
                 }
                 if (board[numInput - 1].equals(String.valueOf(numInput))) {
                     board[numInput - 1] = play;
@@ -49,9 +56,7 @@ public class Game {
                     winner = checkWinner();
                 } else {
                     System.out.println("Slot already taken; re-enter slot number:");
-                    continue;
                 }
-            }
             if (winner.equalsIgnoreCase("draw")) {
                 System.out.println("It's a draw! Thanks for playing.");
             } else {
@@ -120,7 +125,7 @@ public class Game {
             for (int i = 0; i < 9; i++) {
                 board[i] = String.valueOf(i + 1);
             }
-        }
+        }*/
     }
 
 
