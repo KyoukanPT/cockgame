@@ -1,4 +1,4 @@
-package academiadecodigo.org.bitjs.cockgame;
+package org.academiadecodigo.bitjs.cockgame;
 
 public class Main {
 

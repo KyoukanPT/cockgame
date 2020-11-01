@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+
+<project name="Game1" basedir="." default="jarfile">
+
+    <target name="init" description="Initializing properties">
+        <property name="project.name" value="cockgame"/>
+        <property name="src.dir" value="src"/>
+        <property name="build.dir" value="build"/>
+        <property name="classes.dir" value="${build.dir}/classes"/>
+        <property name="lib.dir" value="lib"/>
+        <property name="resources.dir" value="resources"/>
+        <property name="main.class" value="org.academiadecodigo.bitjs.cockgame.Main"/>
+        <path id="classpath">
+            <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        </path>
+    </target>
+
+    <target name="clean" description="Cleanup" depends="init">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="prepare" description="create classes directories" depends="clean">
+        <mkdir dir="${classes.dir}"/>
+    </target>
+
+    <target name="compile" description="Compiles all code" depends="prepare">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <target name="jarfile" description="Archives the code" depends="compile">
+        <jar destfile="${build.dir}/${project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="${lib.dir}"/>
+            </manifest>
+            <fileset dir=".">
+                <include name="**/${resources.dir}/**"/>
+            </fileset>
+            <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
+        </jar>
+    </target>
+
+</project>

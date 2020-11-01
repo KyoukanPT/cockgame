@@ -1,4 +1,4 @@
-package academiadecodigo.org.bitjs.cockgame;
+package org.academiadecodigo.bitjs.cockgame;
 
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
