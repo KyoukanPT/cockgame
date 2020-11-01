@@ -8,13 +8,14 @@ import java.util.InputMismatchException;
 import java.util.LinkedList;
 
 public class Server {
-    private ServerSocket serverSocket;
-    private Boolean gameStart = false;
+    private static ServerSocket serverSocket;
+    private boolean gameStart = false;
     private static LinkedList<Dispatcher> playerPool;
     private int connections;
     private final static String[] board = new String[9];
 
     private static Dispatcher currentPlayer;
+    private static String winner = null;
 
     private final static String PLAYER_X = "X";
     private final static String PLAYER_O = "O";
@@ -62,6 +63,10 @@ public class Server {
                     playerPool.get(0).start();
                     playerPool.get(1).start();
                     printBoard();
+                    currentPlayer.getClientWriter().write("You play first\n" + "Enter a slot number to play\n");
+                    playerPool.get(1).getClientWriter().write("You play second, wait!\n");
+                    currentPlayer.getClientWriter().flush();
+                    playerPool.get(1).getClientWriter().flush();
                 }
             }
         } catch (IOException e) {
@@ -70,30 +75,39 @@ public class Server {
     }
 
     public synchronized static void checkLogic(int play, int playerNum, Dispatcher playerMove) {
-            String winner;
                 try {
-                    if (!(play > 0 && play <= 9)) {
-                        playerPool.get(playerNum).getClientWriter().write("Invalid input; re-enter slot number:");
-                        playerPool.get(playerNum).getClientWriter().flush();
-                    } else if (currentPlayer == playerMove) {
-                        if (currentPlayer.getPlayer() == 1) {
-                            board[play - 1] = "X";
-                        } else {
-                            board[play - 1] = "O";
+                    if ((play > 0 && play <= 9)) {
+                        if (currentPlayer == playerMove) {
+                            if (currentPlayer.getPlayer() == 1) {
+                                board[play - 1] = "X";
+                            } else if (currentPlayer.getPlayer() == 2){
+                                board[play - 1] = "O";
+                            }
+                    } else {
+                            playerMove.getClientWriter().write("Invalid input! Try again\n");
+                            playerMove.getClientWriter().flush();
+                            playerMove.nextPlay();
                         }
-
                         printBoard();
                         winner = checkWinner();
-                        if (winner != null) {
-                            for (Dispatcher player : playerPool) {
-                                player.getClientWriter().write(winner);
-                                player.getClientWriter().flush();
+                            if (winner == null) {
+                                playerPool.get(playerNum - 1).getOpponent().getClientWriter().write("Your turn\n" + "Enter a slot number to play\n");
+                                playerPool.get((playerNum - 2) + 1).getClientWriter().write("It's not your turn, wait!\n");
+                                playerPool.get(playerNum - 1).getOpponent().getClientWriter().flush();
+                                playerPool.get((playerNum - 2) + 1).getClientWriter().flush();
                             }
-                            playerPool.get(0).getClientSocket().close();
-                            playerPool.get(1).getClientSocket().close();
-                            playerPool.get(0).interrupt();
-                            playerPool.get(1).interrupt();
+
+                    }
+
+                    if (winner != null) {
+                        for (Dispatcher player : playerPool) {
+                            player.getClientWriter().write(winner + "THE GAME IS OVER\n");
+                            player.getClientWriter().flush();
                         }
+                            playerPool.get(0).stop();
+                            playerPool.get(0).getClientSocket().close();
+                            playerPool.get(1).stop();
+                            playerPool.get(1).getClientSocket().close();
                     }
                     currentPlayer = playerMove.getOpponent();
                 } catch (InputMismatchException | IOException e) {
@@ -132,26 +146,18 @@ public class Server {
                     break;
             }
             if (line.equals("XXX")) {
-                return PLAYER_X + " is the winner!";
+                return PLAYER_X + " is the winner!\n";
             } else if (line.equals("OOO")) {
-                return PLAYER_O + " is the winner!";
+                return PLAYER_O + " is the winner!\n";
             }
         }
 
         for (int i = 0; i < 9; i++) {
             if (Arrays.asList(board).contains(String.valueOf(i + 1))) {
                 break;
-            } else if (i == 8) return "draw";
+            } else if (i == 8) return "IT'S A DRAW!\n";
         }
 
-        for (Dispatcher players : playerPool) {
-            try {
-                players.getClientWriter().write(players.getPlayer() + "'s turn; enter a slot number to play\n");
-                players.getClientWriter().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         return null;
     }
 
@@ -183,10 +189,18 @@ public class Server {
             }
         }
 
+        public static void resetBoard(){
+            for (int i = 0; i < 9; i++) {
+                board[i] = String.valueOf(i + 1);
+            }
+        }
 
-    public Boolean getGameStart() {
-        return gameStart;
+        public static void setWinner(){
+            winner = null;
+        }
+
+    public static String getWinner(){
+        return winner;
     }
-
 
 }

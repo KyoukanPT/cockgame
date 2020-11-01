@@ -13,7 +13,7 @@ public class Dispatcher extends Thread {
     private Dispatcher opponent;
 
     private BufferedWriter clientWriter;
-    private final StringInputScanner input;
+    private StringInputScanner input;
     private int player;
 
     public Dispatcher(Socket clientSocket) {
@@ -29,25 +29,16 @@ public class Dispatcher extends Thread {
 
     @Override
     public void run() {
+        while (clientSocket.isBound()) {
             nextPlay();
+        }
     }
 
-    public void nextPlay(){
-            while (clientSocket.isConnected()) {
-                if (Thread.currentThread().isAlive()){
-                    input.setMessage("Choose a position: \n");
-                    int test = Integer.parseInt(terminal.getUserInput(input));
-                    Server.checkLogic((test), this.player, this);
-                } else {
-                    try {
-                        this.clientSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    this.interrupt();
-                    break;
-                }
-            }
+    public void nextPlay() {
+        if (Server.getWinner() == null) {
+            input.setMessage("");
+            Server.checkLogic(Integer.parseInt(terminal.getUserInput(input)), this.player, this);
+        }
     }
 
     public int getPlayer() {
@@ -72,6 +63,14 @@ public class Dispatcher extends Thread {
 
    public Dispatcher getOpponent(){
         return this.opponent;
+   }
+
+   public Prompt getTerminal(){
+        return this.terminal;
+   }
+
+   public StringInputScanner getInput(){
+        return this.input;
    }
 
 }
