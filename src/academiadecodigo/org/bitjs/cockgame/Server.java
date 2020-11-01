@@ -19,8 +19,15 @@ public class Server {
     private int connections;
     private static String play;
     private static String[] board = new String[9];
+
     private final static String PLAYER_X = "X";
     private final static String PLAYER_O = "O";
+
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+    private static final String RED_BACKGROUND = "\033[41m";
+    private static final String ANSI_BLUE_BACKGROUND = "\u001B[44m";
 
 
     public Server() {
@@ -71,6 +78,7 @@ public class Server {
                 actualPlayer.write("Invalid input; re-enter slot number:");
                 actualPlayer.flush();
             }
+
             if (playerPool.get(playerNum).getPlayer() == 2) {
                 board[play - 1] = "X";
             } else {
@@ -82,6 +90,19 @@ public class Server {
             System.out.println(winner);
 
         /*if (board[numInput - 1].equals(String.valueOf(numInput))) {
+=======
+        if (playerPool.get(playerNum).getPlayer() == 2){
+            board[play - 1] = "X";
+
+        } else {
+            System.out.println("aqui");
+            board[play - 1] = "O";
+        }
+        printBoard();
+        checkWinner();
+       /*winner = checkWinner();
+        if (board[numInput - 1].equals(String.valueOf(numInput))) {
+>>>>>>> 99f95c1e86a722ea85aece46856af7411917ca35:COCK_GAME/src/academiadecodigo/org/bitjs/cockgame/Server.java
             board[numInput - 1] = play;
             if (play.equals("X")) {
                 play = "O";
@@ -162,6 +183,15 @@ public class Server {
         boardPainter.append("|---" + "|---|" + "---|\n");
         boardPainter.append("| " + board[6] + " | " + board[7] + " | " + board[8] + " |\n");
         boardPainter.append("/---|---|---\\\n");
+
+        boardPainter.append(ANSI_BLUE_BACKGROUND+ANSI_BLACK + "/---|---|---\\\n"+ANSI_RESET);
+        boardPainter.append(ANSI_BLUE_BACKGROUND + ANSI_BLACK + "| "+ board[0] + " | " + board[1] + " | " + board[2] + " |\n"+ANSI_RESET);
+        boardPainter.append(ANSI_BLUE_BACKGROUND+ ANSI_BLACK+ "|---"+ "|---|"+ "---|\n"+ANSI_RESET);
+        boardPainter.append(ANSI_WHITE_BACKGROUND+ ANSI_BLACK+"| " + board[3] + " | " + board[4] + " | " + board[5] + " |\n"+ANSI_RESET);
+        boardPainter.append(ANSI_WHITE_BACKGROUND+ ANSI_BLACK+"|---"+ "|---|"+ "---|\n"+ANSI_RESET);
+        boardPainter.append(RED_BACKGROUND+ ANSI_BLACK+"| " + board[6] + " | " + board[7] + " | " + board[8] + " |\n"+ANSI_RESET);
+        boardPainter.append(RED_BACKGROUND+ ANSI_BLACK+ "/---|---|---\\\n"+ANSI_RESET);
+
         try {
             for (Dispatcher players : playerPool) {
                 players.getClientWriter().write(boardPainter.toString());
