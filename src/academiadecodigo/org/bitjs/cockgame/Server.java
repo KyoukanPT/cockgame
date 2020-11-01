@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,8 +19,11 @@ public class Server {
     private int connections;
     private static String play;
     private static String[] board = new String[9];
+    private final static String PLAYER_X = "X";
+    private final static String PLAYER_O = "O";
 
-    public Server(){
+
+    public Server() {
         try {
             playerPool = new LinkedList<>();
             serverSocket = new ServerSocket(8080);
@@ -29,9 +31,13 @@ public class Server {
             for (int i = 0; i < 9; i++) {
                 board[i] = String.valueOf(i + 1);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setPlay(String play) {
+        Server.play = play;
     }
 
     public void start() {
@@ -44,10 +50,11 @@ public class Server {
                 connections++;
                 player.setPlayer(connections);
                 playerPool.offer(player);
-                if (connections == 2){
+                if (connections == 2) {
                     gameStart = true;
                 }
                 clientHandler.submit(player);
+                checkWinner();
             }
 
         } catch (IOException e) {
@@ -55,23 +62,26 @@ public class Server {
         }
     }
 
-    public synchronized static void checkLogic(int play, int playerNum) {
+    public static void checkLogic(int play, int playerNum) {
         BufferedWriter actualPlayer = playerPool.get(playerNum).getClientWriter();
         String winner = null;
 
         try {
-            if (!(playerNum > 0 && playerNum <= 9)) {
+            if (!(play > 0 && play <= 9)) {
                 actualPlayer.write("Invalid input; re-enter slot number:");
                 actualPlayer.flush();
             }
-        if (playerPool.get(playerNum).getPlayer() == 2){
-            board[play - 1] = "X";
-        } else {
-            board[play - 1] = "O";
-        }
-        printBoard();
-       /*winner = checkWinner();
-        if (board[numInput - 1].equals(String.valueOf(numInput))) {
+            if (playerPool.get(playerNum).getPlayer() == 2) {
+                board[play - 1] = "X";
+            } else {
+                board[play - 1] = "O";
+            }
+
+            printBoard();
+            winner = checkWinner();
+            System.out.println(winner);
+
+        /*if (board[numInput - 1].equals(String.valueOf(numInput))) {
             board[numInput - 1] = play;
             if (play.equals("X")) {
                 play = "O";
@@ -96,6 +106,8 @@ public class Server {
     }
 
     public static String checkWinner() {
+
+
         for (int i = 0; i < 8; i++) {
             String line = null;
             switch (i) {
@@ -125,9 +137,9 @@ public class Server {
                     break;
             }
             if (line.equals("XXX")) {
-                return "X";
+                return PLAYER_X + " is the winner!";
             } else if (line.equals("OOO")) {
-                return "O";
+                return PLAYER_O + " is the winner!";
             }
         }
 
@@ -137,7 +149,7 @@ public class Server {
             } else if (i == 8) return "draw";
         }
 
-        System.out.print(play + "'s turn; enter a slot number to place " + play + " in:");
+        System.out.print(playerPool + "'s turn; enter a slot number to place " + playerPool + " in: ");
         return null;
     }
 
@@ -145,9 +157,9 @@ public class Server {
         StringBuilder boardPainter = new StringBuilder();
         boardPainter.append("/---|---|---\\\n");
         boardPainter.append("| " + board[0] + " | " + board[1] + " | " + board[2] + " |\n");
-        boardPainter.append("|---"+ "|---|"+ "---|\n");
+        boardPainter.append("|---" + "|---|" + "---|\n");
         boardPainter.append("| " + board[3] + " | " + board[4] + " | " + board[5] + " |\n");
-        boardPainter.append("|---"+ "|---|"+ "---|\n");
+        boardPainter.append("|---" + "|---|" + "---|\n");
         boardPainter.append("| " + board[6] + " | " + board[7] + " | " + board[8] + " |\n");
         boardPainter.append("/---|---|---\\\n");
         try {

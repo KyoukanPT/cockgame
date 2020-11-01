@@ -5,6 +5,8 @@ import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Dispatcher implements Runnable {
 
@@ -14,6 +16,8 @@ public class Dispatcher implements Runnable {
     private BufferedWriter clientWriter;
     private StringInputScanner input;
     private int player;
+
+    private Lock gameLock = new ReentrantLock();
 
     public Dispatcher(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -42,9 +46,11 @@ public class Dispatcher implements Runnable {
 
     public void nextPlay(){
         while (clientSocket.isConnected()) {
+            Server.printBoard();
             input.setMessage("Choose a position: \n");
             int test = Integer.parseInt(terminal.getUserInput(input));
             Server.checkLogic((test), this.player);
+            gameLock.lock();
         }
     }
 
