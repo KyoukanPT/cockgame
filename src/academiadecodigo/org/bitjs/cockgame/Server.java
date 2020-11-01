@@ -1,6 +1,5 @@
 package academiadecodigo.org.bitjs.cockgame;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,12 +9,10 @@ import java.util.LinkedList;
 
 public class Server {
     private ServerSocket serverSocket;
-    private Socket clientSocket;
     private Boolean gameStart = false;
     private static LinkedList<Dispatcher> playerPool;
     private int connections;
-    private static String play;
-    private static String[] board = new String[9];
+    private final static String[] board = new String[9];
 
     private static Dispatcher currentPlayer;
 
@@ -44,17 +41,16 @@ public class Server {
 
     }
 
-    public static void setPlay(String play) {
-        Server.play = play;
-    }
-
     public void start() {
         try {
             while (!gameStart) {
                 System.out.println("Waiting for players connections");
-                clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
                 System.out.println("Player connection: " + clientSocket);
                 Dispatcher player = new Dispatcher(clientSocket);
+                player.getClientWriter().write("WELCOME TO THE FABULOUS COCK GAME!");
+                player.getClientWriter().write(printCock());
+                player.getClientWriter().flush();
                 connections++;
                 player.setPlayer(connections);
                 playerPool.offer(player);
@@ -74,7 +70,7 @@ public class Server {
     }
 
     public synchronized static void checkLogic(int play, int playerNum, Dispatcher playerMove) {
-            String winner = null;
+            String winner;
                 try {
                     if (!(play > 0 && play <= 9)) {
                         playerPool.get(playerNum).getClientWriter().write("Invalid input; re-enter slot number:");
@@ -157,6 +153,11 @@ public class Server {
             }
         }
         return null;
+    }
+
+    public String printCock(){
+        StringBuilder cock = new StringBuilder();
+        return cock.toString();
     }
 
     public static void printBoard() {
