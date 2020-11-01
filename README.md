@@ -4,8 +4,8 @@ Weekend project by Tiago Silva, Will Silva, Tiago Gomes, Fernando Oliveira and J
 Created by five students of Academia de Código Terceira. The main goal is to develop a game in 2 days, with only 7  weeks of java programming knowledge.
 _______________________-Hope you enjoy it!!____________________________________
 
-Organisation:
-	Academida de Código
+Organization:
+	Academia de Código
 Class:
 Bijts (2020)
 
