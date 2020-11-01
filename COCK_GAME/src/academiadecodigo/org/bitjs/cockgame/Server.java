@@ -20,6 +20,11 @@ public class Server {
     private int connections;
     private static String play;
     private static String[] board = new String[9];
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+    private static final String RED_BACKGROUND = "\033[41m";
+    private static final String ANSI_BLUE_BACKGROUND = "\u001B[44m";
 
     public Server(){
         try {
@@ -66,10 +71,13 @@ public class Server {
             }
         if (playerPool.get(playerNum).getPlayer() == 2){
             board[play - 1] = "X";
+
         } else {
+            System.out.println("aqui");
             board[play - 1] = "O";
         }
         printBoard();
+        checkWinner();
        /*winner = checkWinner();
         if (board[numInput - 1].equals(String.valueOf(numInput))) {
             board[numInput - 1] = play;
@@ -143,13 +151,14 @@ public class Server {
 
     public static void printBoard() {
         StringBuilder boardPainter = new StringBuilder();
-        boardPainter.append("/---|---|---\\\n");
-        boardPainter.append("| " + board[0] + " | " + board[1] + " | " + board[2] + " |\n");
-        boardPainter.append("|---"+ "|---|"+ "---|\n");
-        boardPainter.append("| " + board[3] + " | " + board[4] + " | " + board[5] + " |\n");
-        boardPainter.append("|---"+ "|---|"+ "---|\n");
-        boardPainter.append("| " + board[6] + " | " + board[7] + " | " + board[8] + " |\n");
-        boardPainter.append("/---|---|---\\\n");
+
+        boardPainter.append(ANSI_BLUE_BACKGROUND+ANSI_BLACK + "/---|---|---\\\n"+ANSI_RESET);
+        boardPainter.append(ANSI_BLUE_BACKGROUND + ANSI_BLACK + "| "+ board[0] + " | " + board[1] + " | " + board[2] + " |\n"+ANSI_RESET);
+        boardPainter.append(ANSI_BLUE_BACKGROUND+ ANSI_BLACK+ "|---"+ "|---|"+ "---|\n"+ANSI_RESET);
+        boardPainter.append(ANSI_WHITE_BACKGROUND+ ANSI_BLACK+"| " + board[3] + " | " + board[4] + " | " + board[5] + " |\n"+ANSI_RESET);
+        boardPainter.append(ANSI_WHITE_BACKGROUND+ ANSI_BLACK+"|---"+ "|---|"+ "---|\n"+ANSI_RESET);
+        boardPainter.append(RED_BACKGROUND+ ANSI_BLACK+"| " + board[6] + " | " + board[7] + " | " + board[8] + " |\n"+ANSI_RESET);
+        boardPainter.append(RED_BACKGROUND+ ANSI_BLACK+ "/---|---|---\\\n"+ANSI_RESET);
         try {
             for (Dispatcher players : playerPool) {
                 players.getClientWriter().write(boardPainter.toString());
