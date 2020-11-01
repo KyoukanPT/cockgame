@@ -5,19 +5,16 @@ import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class Dispatcher implements Runnable {
+public class Dispatcher extends Thread {
 
     private Socket clientSocket;
     private Prompt terminal;
+    private Dispatcher opponent;
 
     private BufferedWriter clientWriter;
     private StringInputScanner input;
     private int player;
-
-    private Lock gameLock = new ReentrantLock();
 
     public Dispatcher(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -25,12 +22,9 @@ public class Dispatcher implements Runnable {
         try {
             clientWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             terminal = new Prompt(clientSocket.getInputStream(), new PrintStream(clientSocket.getOutputStream()));
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -38,6 +32,7 @@ public class Dispatcher implements Runnable {
         try {
             clientWriter.write("Welcome to the fabulous Cock Game.\n" + "--------------------------------\n");
             clientWriter.flush();
+
             nextPlay();
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,13 +40,26 @@ public class Dispatcher implements Runnable {
     }
 
     public void nextPlay(){
-        while (clientSocket.isConnected()) {
-            Server.printBoard();
-            input.setMessage("Choose a position: \n");
-            int test = Integer.parseInt(terminal.getUserInput(input));
-            Server.checkLogic((test), this.player);
-            gameLock.lock();
-        }
+            while (clientSocket.isConnected()) {
+                if (Thread.currentThread().isAlive()){
+                    input.setMessage("Choose a position: \n");
+                    int test = Integer.parseInt(terminal.getUserInput(input));
+                    Server.checkLogic((test), this.player, this);
+                } else {
+                    try {
+                        this.clientSocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    this.interrupt();
+                    break;
+                    /*try {
+                        Thread.currentThread().wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+                }
+            }
     }
 
     public int getPlayer() {
@@ -62,8 +70,16 @@ public class Dispatcher implements Runnable {
         this.player = player;
     }
 
+    public void setOpponent(Dispatcher opponent){
+        this.opponent = opponent;
+    }
+
     public Prompt getTerminal() {
         return this.terminal;
+    }
+
+    public Socket getClientSocket(){
+        return this.clientSocket;
     }
 
     public StringInputScanner getInput() {
@@ -73,5 +89,9 @@ public class Dispatcher implements Runnable {
     public BufferedWriter getClientWriter() {
         return this.clientWriter;
     }
+
+   public Dispatcher getOpponent(){
+        return this.opponent;
+   }
 
 }
