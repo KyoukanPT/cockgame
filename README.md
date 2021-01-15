@@ -10,8 +10,8 @@ Class:
 Bijts (2020)
 
 Creators:
-Tiago Pereira Gomes
-Tiago Gomes da Silva 
-Will Silva
-João Andrade
-Fernando Oliveira
+Tiago Pereira Gomes, 
+Tiago Gomes da Silva,  
+Will Silva, 
+João Andrade, 
+Fernando Oliveira.
