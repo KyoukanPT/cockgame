@@ -234,4 +234,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij,intellij+all,windows,linux
